@@ -1,0 +1,16 @@
+{
+  "name": "dont-catch-it",
+  "version": "1.0.0",
+  "description": "Pumpkin Blade Ball for Decentraland",
+  "scripts": {
+    "start": "sdk-commands start",
+    "build": "sdk-commands build",
+    "deploy": "sdk-commands deploy",
+    "server-logs": "sdk-commands sdk-server-logs",
+    "lava": "python3 scripts/generate-lava-shape.py"
+  },
+  "dependencies": {
+    "@dcl/js-runtime": "7.29.1-36637355925.commit-d261ba1",
+    "@dcl/sdk": "^7.29.1-36637355925.commit-d261ba1"
+  }
+}
