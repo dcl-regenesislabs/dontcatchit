@@ -67,7 +67,6 @@ export enum EntityNames {
   Sky_glb = "Sky.glb",
   StartGame_glb = "StartGame.glb",
   StartGameLights_glb = "StartGameLights.glb",
-  TargetRing_glb = "TargetRing.glb",
   Tree01_glb = "Tree01.glb",
   Tree01_glb_2 = "Tree01.glb_2",
   Tree01_glb_3 = "Tree01.glb_3",

@@ -192,6 +192,7 @@ export function eliminate(address: string, reason: 'hp' | 'fell' = 'hp', at?: Ve
   if (!p || p.status !== PlayerStatus.Alive) return
   setHp(p, 0)
   setStatus(address, p, PlayerStatus.Out)
+  at = at ?? lastPositions.get(address) // where they were, before the teleport (clients leave a blood splat there)
   teleport(address, SPECTATOR_SPOT, ARENA_CENTER)
 
   // Match recap for everyone. An 'hp' elimination credits whoever last parried the pumpkin.

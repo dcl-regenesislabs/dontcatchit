@@ -12,8 +12,12 @@ export const SOUND_MENU_ICON = 'assets/images/SoundOn.png' // the same icon as t
 export const ARENA_MUSIC = 'assets/sounds/arena-music.mp3'
 
 const DEFAULT_VOLUME = 0.3
+const ARENA_BOOST = 1.7 // the arena track is mastered quieter than the lobby one: scale it up to match
+const trackLevel = (clip: string) => (clip === ARENA_MUSIC ? ARENA_BOOST : 1)
+const outVolume = (clip: string, gain: number) => Math.min(1, volume * trackLevel(clip) * gain)
 const DEFAULT_SFX_VOLUME = 0.6
 const VOLUME_STEP = 0.1
+const ARENA_FADE_PER_SECOND = 3 // ~0.3 s each way when switching into or out of the arena track
 const SAVE_AFTER_MS = 1500 // wait for the player to stop adjusting before saving
 const FADE_PER_SECOND = 0.7 // crossfade speed: a full fade takes ~1.4 s
 
@@ -87,7 +91,7 @@ export const music = {
  * Background music, clients only. One audio entity parented to the player (so it plays at a flat volume anywhere,
  * no spatial fade), same approach as the Marsh Colony jukebox: it starts at the real volume, and a clip is swapped
  * with createOrReplace (changing audioClipUrl on the live component is ignored by the renderer).
- * The lobby loop plays while waiting (lobby, countdown, winner); the arena loop from the 3-2-1 until the round
+ * The lobby loop plays while waiting (lobby, winner); the arena loop from the 3-2-1 until the round
  * ends. Switching fades the current track out, swaps, and fades the new one in.
  */
 export function setupMusic() {
@@ -122,9 +126,9 @@ export function setupMusic() {
 
   const entity = engine.addEntity()
   Transform.create(entity, { parent: engine.PlayerEntity, position: Vector3.Zero() })
-  let current = LOBBY_MUSIC
+  let current: string = LOBBY_MUSIC
   let gain = 1 // fade level of the current clip
-  AudioSource.create(entity, { audioClipUrl: current, playing: !muted, loop: true, volume: volume })
+  AudioSource.create(entity, { audioClipUrl: current, playing: !muted, loop: true, volume: outVolume(current, gain) })
   console.log('[CLIENT] music started (volume', Math.round(volume * 100) + '%)')
 
   engine.addSystem((dt: number) => {
@@ -133,13 +137,14 @@ export function setupMusic() {
     const fighting = phase === Phase.Starting || phase === Phase.Round
     const wanted = fighting ? ARENA_MUSIC : LOBBY_MUSIC
 
-    const step = FADE_PER_SECOND * dt
+    // into the arena track fast, so it is already playing as the 3-2-1 begins (that phase only lasts a few seconds)
+    const step = (wanted === ARENA_MUSIC || current === ARENA_MUSIC ? ARENA_FADE_PER_SECOND : FADE_PER_SECOND) * dt
     if (wanted !== current) {
       gain = Math.max(0, gain - step) // fade the old clip out...
       if (gain <= 0.02) {
         current = wanted // ...swap the whole component, then fade in from near silence
-        gain = 0.05
-        AudioSource.createOrReplace(entity, { audioClipUrl: current, playing: !muted, loop: true, volume: volume * gain })
+        gain = 0.2
+        AudioSource.createOrReplace(entity, { audioClipUrl: current, playing: !muted, loop: true, volume: outVolume(current, gain) })
         return
       }
     } else {
@@ -147,7 +152,7 @@ export function setupMusic() {
     }
 
     const audio = AudioSource.getMutable(entity)
-    const level = volume * gain
+    const level = outVolume(current, gain)
     if (audio.playing !== !muted) audio.playing = !muted
     if (audio.volume !== level) audio.volume = level
   })

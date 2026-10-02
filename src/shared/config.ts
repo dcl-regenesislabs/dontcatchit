@@ -103,9 +103,16 @@ export const SERVER_FALLBACK_S = 1.2 // no report this long after the server's b
 export const PARRY_EMOTE_SRC = 'assets/models/sword_attack_emote.glb' // must end with _emote.glb
 export const SWORD_MODEL = 'assets/models/BaseballBat.glb'
 export const SWORD_SCALE = 0.85 // the bat model is ~0.98 m long
-export const SWORD_OFFSET = { x: 0, y: 0.12, z: 0 } // slide within the hand's local axes; +y moves along the arm toward the fingers (the anchor sits at the wrist)
+// WHERE the bat sits in the hand, in metres, along the hand's own axes (the anchor is at the wrist). Edit the numbers, save,
+// and the running preview reloads. Change one value at a time, by 0.02-0.05, and look at it from the side and from above:
+//   y: along the arm. + moves the bat toward the fingers (down), - back toward the wrist. Slides the grip up/down the handle.
+//   x, z: across the hand, so the bat sits more to the palm side or the back of the hand. If one of them moves it the wrong
+//   way, just use the opposite sign. If the bat clips the leg/hip, move it away from the body with these.
+export const SWORD_OFFSET = { x: 0.02, y: 0.1, z: 0.05 }
 export const SWORD_ROLL_DEGREES = 0 // spin around the weapon's own axis (a round bat looks the same at any roll)
-export const SWORD_ROTATION_DEGREES = { x: 90, y: 0, z: 0 } // weapon points forward, confirmed by eye
+// Orientation of the weapon in the hand. x 90 = out forward. Tilting x (45/135) was wrong: it pointed the bat up/down the arm.
+// y turns it sideways around the arm (currently tuned by eye). z is the other sideways tilt.
+export const SWORD_ROTATION_DEGREES = { x: 90, y: -21, z: 0 }
 
 // Pumpkin model: now ~0.37 m wide with its origin near the middle. Scaled x2.4 to ~0.9 m so it reads in a 44 m arena;
 // set PUMPKIN_MODEL_SCALE to 1 (and OFFSET_Y to -0.065) to use it at its authored size.

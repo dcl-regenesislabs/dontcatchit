@@ -28,7 +28,7 @@ interface Bubble {
 
 const PALETTE: Record<Kind, Color4[]> = {
   trail: [Color4.create(0.6, 0.2, 1, 1), Color4.create(0.82, 0.45, 1, 1)], // purple
-  splash: [Color4.create(1, 0.1, 0, 1), Color4.create(1, 0.5, 0, 1)], // red + orange
+  splash: [Color4.create(0.85, 0, 0.02, 1), Color4.create(1, 0.08, 0.05, 1)], // red
   parry: [Color4.create(1, 0.5, 0, 1), Color4.create(1, 0.7, 0.1, 1)], // orange only
   lava: [Color4.create(0.15, 1, 0.05, 1), Color4.create(0.35, 1, 0.12, 1)] // saturated neon green (kept away from white so the glow doesn't wash out)
 }
@@ -267,7 +267,7 @@ export function trail(at: Vector3) {
   lastTrail = Vector3.clone(at)
 }
 
-// ---- Hit: a red/orange fountain out of the player ----
+// ---- Hit: a red fountain out of the player ----
 
 export function splash(at: Vector3) {
   for (let i = 0; i < 22; i++) {
@@ -284,7 +284,7 @@ export function splash(at: Vector3) {
   }
 }
 
-// ---- Lava splash: a player falls into the lava. A big green fountain with a few red/orange embers ----
+// ---- Lava splash: a player falls into the lava. A big green fountain with a few red embers ----
 
 export function lavaSplash(at: Vector3) {
   for (let i = 0; i < 30; i++) {

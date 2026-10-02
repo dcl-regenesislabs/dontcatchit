@@ -19,6 +19,7 @@ import { setupControls } from './controls'
 import { parryFeedback } from './feedback'
 import { requestParry, sinceLastPress, swing, updateParryFeedback } from './parry'
 import { debug } from './debug'
+import { bloodSplat, setupBlood } from './blood'
 import { teleportFx, lavaSplash, parryBurst, setupEffects, setupLavaBubbles, setupLavaFlow, splash, trail, trailReset } from './effects'
 import { feed } from './feed'
 import { displayName } from './names'
@@ -41,6 +42,7 @@ import { Pumpkin } from '../shared/schemas'
 export function initClient() {
   preloadSfx()
   setupEffects()
+  setupBlood()
   setupLavaBubbles()
   setupLavaFlow()
   setupSpinningModels()
@@ -89,6 +91,7 @@ export function initClient() {
     feed.add({ kind, victimId: d.victimId, killerId: d.killerId, at: Date.now() })
     // A splash where they fell in (the victim has already been teleported away, so the server sends the spot)
     if (kind === 'fall') lavaSplash(Vector3.create(d.x, LAVA_SURFACE_Y + 0.15, d.z))
+    bloodSplat(d.x, d.z) // a stain on the ring where they went out (kept until the next game starts)
     if (d.victimId === getPlayer()?.userId?.toLowerCase()) {
       playSfx(EVIL_LAUGH_SFX) // right as the skull appears
       parryFeedback.eliminate(
