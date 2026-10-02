@@ -135,6 +135,8 @@ function canvasHeight(): number {
 }
 /** Fixed-size pieces (buttons, modals): a design size in virtual pixels, scaled up on phones (same idea as Marsh Colony). */
 const S = (n: number) => Math.round(n * (isMobile() ? 1.6 : 1.18))
+/** Like S() but for the in-game status HUD (banner, parry/ouch pop-up, hearts): on phones these stay compact so they don't cover the arena. */
+const HS = (n: number) => Math.round(n * (isMobile() ? 0.8 : 1.18))
 const fontPx = (fractionOfHeight: number) => Math.max(9, Math.round(fractionOfHeight * canvasHeight()))
 
 const WHITE = Color4.White()
@@ -163,9 +165,9 @@ const StatusBanner = (props: { text: string; tone: Tone }) => {
     popPress('banner')
   }
   const k = popFactor('banner')
-  const font = S(24)
-  const baseW = Math.max(S(240), estW(props.text, font) + S(56))
-  const baseH = S(48)
+  const font = HS(24)
+  const baseW = Math.max(HS(240), estW(props.text, font) + HS(56))
+  const baseH = HS(48)
   const w = Math.round(baseW * k)
   const h = Math.round(baseH * k)
   const pulse = props.tone === 'danger' ? 0.5 + 0.5 * Math.sin(Date.now() / 140) : 0
@@ -175,7 +177,7 @@ const StatusBanner = (props: { text: string; tone: Tone }) => {
     <UiEntity
       uiTransform={{
         positionType: 'absolute',
-        position: { top: S(10), left: '50%' },
+        position: { top: HS(10), left: '50%' },
         margin: { left: -Math.round(w / 2) },
         width: w,
         height: h,
@@ -336,14 +338,14 @@ const FeedbackPop = (props: { text: string; age: number }) => {
   const edge = good ? Color4.create(0.3, 0.9, 0.4, 1) : bad ? DANGER_EDGE : Color4.create(0.6, 0.6, 0.75, 1)
   const pop = easeOutBack(clamp01(props.age / 180))
   const fade = 1 - clamp01((props.age - (NOTICE_SHOW_MS - 250)) / 250)
-  const font = Math.max(8, Math.round(S(34) * Math.max(0.2, pop)))
-  const w = estW(t, font) + S(56)
+  const font = Math.max(8, Math.round(HS(34) * Math.max(0.2, pop)))
+  const w = estW(t, font) + HS(56)
   const h = Math.round(font * 1.7)
   return (
     <UiEntity
       uiTransform={{
         positionType: 'absolute',
-        position: { top: S(132), left: '50%' },
+        position: { top: HS(132), left: '50%' },
         margin: { left: -Math.round(w / 2) },
         width: w,
         height: h,
@@ -779,8 +781,8 @@ const Hearts = () => {
   const hp = myHp()
   if (lastHp >= 0 && hp < lastHp) for (let i = hp; i < lastHp; i++) popPress(`heart-${i}`)
   lastHp = hp
-  const size = S(46)
-  const gap = S(6)
+  const size = HS(46)
+  const gap = HS(6)
   const total = MAX_HP * size + (MAX_HP - 1) * gap
   const hearts = []
   for (let i = 0; i < MAX_HP; i++) {
@@ -799,7 +801,7 @@ const Hearts = () => {
     <UiEntity
       uiTransform={{
         positionType: 'absolute',
-        position: { top: S(66), left: '50%' },
+        position: { top: HS(66), left: '50%' },
         margin: { left: -Math.round(total / 2) },
         width: total,
         height: size,
