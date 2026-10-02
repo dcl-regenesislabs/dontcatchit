@@ -137,6 +137,9 @@ function canvasHeight(): number {
 const S = (n: number) => Math.round(n * (isMobile() ? 1.6 : 1.18))
 /** Like S() but for the in-game status HUD (banner, parry/ouch pop-up, hearts): on phones these stay compact so they don't cover the arena. */
 const HS = (n: number) => Math.round(n * (isMobile() ? 0.8 : 1.18))
+/** Scale for the match recap (top-right feed): small on phones, where many players fill the screen with rows quickly. */
+const FS = (n: number) => Math.round(n * (isMobile() ? 0.85 : 1.18))
+const FEED_MAX_ROWS_MOBILE = 3
 const fontPx = (fractionOfHeight: number) => Math.max(9, Math.round(fractionOfHeight * canvasHeight()))
 
 const WHITE = Color4.White()
@@ -598,9 +601,9 @@ let soundButtonShown = false
 
 const FeedRow = (props: { entry: FeedEntry; index: number; key?: string }) => {
   const e = props.entry
-  const ICON = S(30)
-  const font = S(16)
-  const gap = S(8)
+  const ICON = FS(30)
+  const font = FS(16)
+  const gap = FS(8)
   const parts: FeedPart[] =
     e.kind === 'fall'
       ? [
@@ -616,22 +619,22 @@ const FeedRow = (props: { entry: FeedEntry; index: number; key?: string }) => {
           { kind: 'text', text: displayName(e.victimId) }
         ]
   const widths = parts.map((part) => (part.kind === 'text' ? estW(part.text, font) : ICON))
-  const w = widths.reduce((a, b) => a + b, 0) + gap * (parts.length - 1) + S(24)
-  const h = S(40)
+  const w = widths.reduce((a, b) => a + b, 0) + gap * (parts.length - 1) + FS(24)
+  const h = FS(40)
   const age = Date.now() - e.at
   const slide = easeOutCubic(clamp01(age / 260))
   const fade = 1 - clamp01((age - (FEED_TTL_MS - 600)) / 600)
-  const top = (soundButtonShown ? S(64) : S(10)) + props.index * (h + S(6))
+  const top = (soundButtonShown ? FS(64) : FS(10)) + props.index * (h + FS(6))
   return (
     <UiEntity
       uiTransform={{
         positionType: 'absolute',
-        position: { top, right: Math.round(S(12) - (1 - slide) * (w + S(20))) },
+        position: { top, right: Math.round(FS(12) - (1 - slide) * (w + FS(20))) },
         width: w,
         height: h,
         flexDirection: 'row',
         alignItems: 'center',
-        padding: { left: S(12), right: S(12) },
+        padding: { left: FS(12), right: FS(12) },
         borderRadius: Math.round(h / 2),
         borderWidth: 2,
         borderColor: Color4.create(EDGE.r, EDGE.g, EDGE.b, 0.7 * fade)
@@ -649,7 +652,7 @@ const FeedRow = (props: { entry: FeedEntry; index: number; key?: string }) => {
               color={part.color ?? WHITE}
               textAlign="middle-left"
               textWrap="nowrap"
-              uiTransform={{ width: widths[i], height: S(24), margin }}
+              uiTransform={{ width: widths[i], height: FS(24), margin }}
             />
           )
         }
@@ -668,7 +671,7 @@ const FeedRow = (props: { entry: FeedEntry; index: number; key?: string }) => {
 // Match recap, top right.
 const KillFeed = () => (
   <UiEntity uiTransform={{ width: '100%', height: '100%', positionType: 'absolute', pointerFilter: 'none' }}>
-    {feed.recent().map((entry, i) => (
+    {feed.recent().slice(0, isMobile() ? FEED_MAX_ROWS_MOBILE : undefined).map((entry, i) => (
       <FeedRow key={`feed-${entry.at}-${entry.victimId}`} entry={entry} index={i} />
     ))}
   </UiEntity>
